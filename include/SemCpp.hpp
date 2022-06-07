@@ -31,12 +31,12 @@ public:
     /** Waits for the semaphore to become available. */
     void wait() noexcept;
 
-    /** Waits for the semaphore to become available for a maximum of @a time.
+    /** Waits for the semaphore to become available for @a time.
      * If the semaphore becomes available before @a time has elapsed, returns
      * `true`, otherwise returns `false`. */
     bool wait_for(std::chrono::seconds time);
 
-    /** Waits for the semaphore to become available until, at latest, @a time.
+    /** Waits for the semaphore to become available until @a time.
      * If the semaphore becomes available before @a time, returns `true`,
      * otherwise returns `false`. */
     bool wait_until(std::chrono::time_point<clock_t> time);
