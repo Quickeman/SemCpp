@@ -11,10 +11,13 @@ public:
     using clock_t = std::chrono::steady_clock;
 
     /** Constructor. */
-    BinarySemaphore(bool init = false);
+    BinarySemaphore();
 
     /** Destructor. Default. */
     ~BinarySemaphore() = default;
+
+    /** Resets the semaphore to initial conditions, i.e. unavailable. */
+    void reset() noexcept;
 
     /** Posts semaphore availability.
      * @returns the previous state of the semaphore. */
@@ -54,10 +57,13 @@ public:
     using clock_t = std::chrono::steady_clock;
 
     /** Constructor. */
-    CountingSemaphore(count_t init = 0);
+    CountingSemaphore();
 
     /** Destructor. Default. */
     ~CountingSemaphore() = default;
+
+    /** Resets the semaphore to initial conditions, i.e. unavailable. */
+    void reset() noexcept;
 
     /** Posts semaphore availability. */
     count_t post(count_t n = 1) noexcept;

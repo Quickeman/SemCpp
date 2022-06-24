@@ -2,8 +2,12 @@
 
 // class BinarySemaphore
 
-BinarySemaphore::BinarySemaphore(bool i):
-_flag{i} {}
+BinarySemaphore::BinarySemaphore():
+_flag{false} {}
+
+void BinarySemaphore::reset() noexcept {
+    this->_flag = false;
+}
 
 bool BinarySemaphore::post() noexcept {
     const auto p {this->_flag};
@@ -40,8 +44,12 @@ bool BinarySemaphore::wait_until(std::chrono::time_point<clock_t> t) {
 
 // class CountingSemaphore
 
-CountingSemaphore::CountingSemaphore(count_t i):
-_count{i} {}
+CountingSemaphore::CountingSemaphore():
+_count{0} {}
+
+void CountingSemaphore::reset() noexcept {
+    this->_count = 0;
+}
 
 CountingSemaphore::count_t CountingSemaphore::post(count_t n) noexcept {
     this->_count += n;
