@@ -109,7 +109,7 @@ bool Semaphore::wait_until(std::chrono::time_point<Clock> t) {
 
     const auto secs {time_point_cast<seconds>(t)};
     const auto ns {time_point_cast<nanoseconds>(t) - time_point_cast<nanoseconds>(secs)};
-    const timespec tmspc {secs.time_since_epoch().count(), ns.count()};
+    const timespec tmspc = {secs.time_since_epoch().count(), ns.count()};
 
     if (sem_timedwait(this->_sem, &tmspc) == -1) {
         switch (errno) {
