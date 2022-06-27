@@ -36,7 +36,9 @@ set_target_properties(${LIB_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # Link the RT library
-target_link_libraries(${LIB_NAME} rt)
+if (UNIX AND NOT APPLE)
+    target_link_libraries(${LIB_NAME} rt)
+endif()
 
 
 ### UNIT TESTS ###
@@ -52,18 +54,21 @@ foreach(testSrc ${TEST_SRCS})
     # Get extension-less file name
     get_filename_component(testFileName ${testSrc} NAME_WE)
     # Make test name
-    set(testName ${PROJECT_NAME}_test_${testFileName})
+    set(testName ${PROJECT_NAME}_${testFileName})
     # Add target
     add_executable(${testName} ${testSrc})
     # Link to relevant libraries
     target_link_libraries(${testName} ${LIB_NAME})
+    if (UNIX AND NOT APPLE)
+        target_link_libraries(${testName} rt)
+    endif()
     # Put test executables in their own directory
     set_target_properties(${testName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test/bin)
-
-    # Add test to execution
-    add_test(
-        NAME ${testName}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/bin
-        COMMAND ${testName}
-    )
 endforeach(testSrc)
+
+# Add test to execution
+add_test(
+    NAME SemCpp_test1
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/test/bin
+    COMMAND SemCpp_test1
+)
