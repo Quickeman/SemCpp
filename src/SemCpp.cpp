@@ -2,6 +2,7 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <limits.h>
 #include <stdexcept>
 #include <iostream>
 #include <thread> // for yield
