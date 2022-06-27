@@ -1,96 +1,62 @@
 #ifndef SEMAPHORE_CPP_H
 #define SEMAPHORE_CPP_H
 
+#include <semaphore.h>
+#include <string>
 #include <chrono>
 
-/** Binary semaphore class.
- * Any call to @ref wait will acquire all previous @ref post calls. */
-class BinarySemaphore {
+/** Semaphore class. */
+class Semaphore {
 public:
-    /** Clock type used for the @ref wait_for and @ref wait_until methods. */
-    using clock_t = std::chrono::steady_clock;
-
-    /** Constructor. */
-    BinarySemaphore();
-
-    /** Destructor. Default. */
-    ~BinarySemaphore() = default;
-
-    /** Resets the semaphore to initial conditions, i.e. unavailable. */
-    void reset() noexcept;
-
-    /** Posts semaphore availability.
-     * @returns the previous state of the semaphore. */
-    bool post() noexcept;
-
-    /** Checks for semaphore availability.
-     * Returns immediately with `true` if available, `false` otherwise. */
-    bool check() const noexcept;
-
-    /** Waits for the semaphore to become available. */
-    void wait() noexcept;
-
-    /** Waits for the semaphore to become available for @a time.
-     * If the semaphore becomes available before @a time has elapsed, returns
-     * `true`, otherwise returns `false`. */
-    bool wait_for(std::chrono::seconds time);
-
-    /** Waits for the semaphore to become available until @a time.
-     * If the semaphore becomes available before @a time, returns `true`,
-     * otherwise returns `false`. */
-    bool wait_until(std::chrono::time_point<clock_t> time);
-
-private:
-    /** Semaphore availability flag. */
-    bool _flag;
-};
-
-
-/** Counting semaphore class.
- * Each @ref post adds an availability to the semaphore. */
-class CountingSemaphore {
-public:
-    /** Type used for post count. */
-    using count_t = unsigned;
+    /** Type used for semaphore count. */
+    using Count = unsigned;
 
     /** Clock type used for the @ref wait_for and @ref wait_until methods. */
-    using clock_t = std::chrono::steady_clock;
+    using Clock = std::chrono::system_clock;
 
-    /** Constructor. */
-    CountingSemaphore();
+    /** Constructor.
+     * Opens the named POSIX semaphore for use. Creates it if it does not exist. */
+    Semaphore(const std::string& name, Count init = 0);
 
-    /** Destructor. Default. */
-    ~CountingSemaphore() = default;
-
-    /** Resets the semaphore to initial conditions, i.e. unavailable. */
-    void reset() noexcept;
+    /** Destructor.
+     * Removes the POSIX semaphore from the kernel.
+     * Other processes may still use the semaphore until all processes using it
+     * have exit, but no new references to the semaphore may be established. */
+    ~Semaphore();
 
     /** Posts semaphore availability. */
-    count_t post(count_t n = 1) noexcept;
+    void post();
 
-    /** @returns the availability count of the semaphore. */
-    count_t count() const noexcept;
-
-    /** Checks for semaphore availability.
+    /** Checks for semaphore availability, consuming availability if there is any.
      * Returns immediately with `true` if available, `false` otherwise. */
-    bool check() const noexcept;
+    bool check();
 
     /** Waits for the semaphore to become available. */
-    void wait() noexcept;
+    void wait();
 
     /** Waits for the semaphore to become available for @a time.
      * If the semaphore becomes available before @a time has elapsed, returns
      * `true`, otherwise returns `false`. */
-    bool wait_for(std::chrono::seconds time);
+    template<class R, class P>
+    bool wait_for(std::chrono::duration<R, P> time);
 
     /** Waits for the semaphore to become available until @a time.
      * If the semaphore becomes available before @a time, returns `true`,
      * otherwise returns `false`. */
-    bool wait_until(std::chrono::time_point<clock_t> time);
+    bool wait_until(std::chrono::time_point<Clock> time);
 
 private:
-    /** Semaphore availability counter. */
-    count_t _count;
+    /** POSIX semaphore object. */
+    sem_t* _sem;
+
+    /** Name of the semaphore. */
+    const std::string _name;
 };
+
+
+template<class R, class P>
+bool Semaphore::wait_for(std::chrono::duration<R, P> time) {
+    return this->wait_until(Clock::now() + time);
+}
 
 #endif
