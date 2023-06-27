@@ -60,7 +60,7 @@ foreach(testSrc ${TEST_SRCS})
     # Link to relevant libraries
     target_link_libraries(${testName} ${LIB_NAME})
     if (UNIX AND NOT APPLE)
-        target_link_libraries(${testName} rt)
+        target_link_libraries(${testName} rt pthread)
     endif()
     # Put test executables in their own directory
     set_target_properties(${testName} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/test/bin)
